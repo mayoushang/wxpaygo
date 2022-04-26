@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 const (
@@ -16,6 +18,9 @@ const (
 
 	// TradeTypeApp App支付
 	TradeTypeApp = "APP"
+
+	// TradeTypeApp App支付
+	TradeTypeH5 = "MWEB"
 )
 
 const (
@@ -62,7 +67,7 @@ func UnifiedOrder(cfg *Config, body string, outTradeNo string, totalFee int, ope
 
 	if clientIP != "" {
 		param.SpbillCreateIP = clientIP
-	} else if cfg.TradeType == TradeTypeNative {
+	} else if cfg.TradeType == TradeTypeNative || cfg.TradeType == TradeTypeH5{
 		param.SpbillCreateIP = cfg.ServerAddr
 	}
 
@@ -113,6 +118,20 @@ func NativeTrade(cfg *Config, body string, outTradeNo string, totalFee int) (str
 	return resp.CodeURL, nil
 }
 
+// h5支付
+func H5Trade(cfg *Config, body string, outTradeNo string, totalFee int) (string, error) {
+	if cfg.TradeType != TradeTypeH5 {
+		return "", fmt.Errorf("支付类型错误，export: %s, got: %s", TradeTypeNative, cfg.TradeType)
+	}
+
+	resp, err := UnifiedOrder(cfg, body, outTradeNo, totalFee, "", "")
+	if err != nil {
+		return "", err
+	}
+
+	return resp.H5URL, nil
+}
+
 // Notify 异步回调
 func Notify(cfg *Config, req *http.Request) (resp *NotifyResponse, err error) {
 	data, err := ioutil.ReadAll(req.Body)
@@ -155,4 +174,19 @@ func SendRequest(client *http.Client, method string, urlStr string, param Parame
 	}
 
 	return ParseResponse(response, resp, key)
+}
+
+// 生成sign值
+func MakeSign(m map[string]interface{}, key string) string {
+	return makeSign(m,key)
+}
+
+// makeNonceStr 生成随机字符串
+func MakeNonceStr(n int) string {
+	return makeNonceStr(n)
+}
+
+//取时间戳
+func MakeUnixTime() string{
+    return strconv.FormatInt(time.Now().Unix(), 10)
 }

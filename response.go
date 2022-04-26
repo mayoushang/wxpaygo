@@ -49,7 +49,6 @@ func ParseResponse(response *http.Response, resp Responser, key string) error {
 	if err != nil {
 		return err
 	}
-
 	err = parseResponse(data, resp, key)
 	if err != nil {
 		return err
