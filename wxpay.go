@@ -52,6 +52,9 @@ const (
 
 	// OrderQueryAPI 查询订单接口
 	OrderQueryAPI = "https://api.mch.weixin.qq.com/pay/orderquery"
+
+	// 退款接口
+	RefundOrderAPI = "https://api.mch.weixin.qq.com/secapi/pay/refund"
 )
 
 // UnifiedOrder 统一下单接口
@@ -158,6 +161,21 @@ func OrderQuery(cfg *Config, transactionID string, outTradeNo string) (resp *Ord
 
 	resp = new(OrderQueryResponse)
 	err = SendRequest(NewClient(cfg), http.MethodPost, OrderQueryAPI, param, resp, cfg.AppSecret)
+	return
+}
+
+// 退款
+func Refund(cfg *Config, Transaction_id string, Out_refund_no string, Total_fee int, Refund_fee int, Refund_desc string) (resp *RefundOrderResponse, err error) {
+	param := new(RefundOrderParam)
+	param.Param = NewParam(cfg)
+	param.Transaction_id = Transaction_id
+	param.Out_refund_no = Out_refund_no
+	param.Total_fee = Total_fee
+	param.Refund_fee = Refund_fee
+	param.Refund_desc = Refund_desc
+	
+	resp = new(RefundOrderResponse)
+	err = SendRequest(NewClient(cfg), http.MethodPost, RefundOrderAPI, param, resp, cfg.AppSecret)
 	return
 }
 
