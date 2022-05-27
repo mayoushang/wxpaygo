@@ -122,12 +122,12 @@ func NativeTrade(cfg *Config, body string, outTradeNo string, totalFee int) (str
 }
 
 // h5支付
-func H5Trade(cfg *Config, body string, outTradeNo string, totalFee int) (string, error) {
+func H5Trade(cfg *Config, body string, outTradeNo string, totalFee int, clientIP string) (string, error) {
 	if cfg.TradeType != TradeTypeH5 {
 		return "", fmt.Errorf("支付类型错误，export: %s, got: %s", TradeTypeNative, cfg.TradeType)
 	}
 
-	resp, err := UnifiedOrder(cfg, body, outTradeNo, totalFee, "", "")
+	resp, err := UnifiedOrder(cfg, body, outTradeNo, totalFee, "", clientIP)
 	if err != nil {
 		return "", err
 	}
